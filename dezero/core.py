@@ -105,6 +105,7 @@ class Variable:
 
 
 
+
 def as_variable(obj):
     if isinstance(obj,Variable):
         return obj
@@ -285,6 +286,7 @@ def setup_variable():
     Variable.__truediv__=div
     Variable.__rtruediv__=rdiv
     Variable.__pow__=pow
+    Variable.__getitem__ = dezero.functions.get_item
 
 
 def numerical_diff(f:Function,x:Variable,eps=1e-4):

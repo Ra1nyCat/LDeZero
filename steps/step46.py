@@ -7,6 +7,9 @@ import dezero.functions as F
 import numpy as np
 import dezero.layers as L
 from dezero import Model
+from dezero import optimizers
+from dezero.models import MLP
+
 
 np.random.seed(0)
 x=np.random.rand(100,1)
@@ -17,19 +20,9 @@ lr=0.2
 max_iter=10000
 hidden_size=10
 
-#定义模型
-class TwoLayerNet(Model):
-    def __init__(self,hidden_size,out_size):
-        super().__init__()
-        self.l1=L.Linear(hidden_size)
-        self.l2=L.Linear(out_size)
-    
-    def forward(self,x):
-        y=F.sigmoid(self.l1(x))
-        y=self.l2(y)
-        return y
+model=MLP(hidden_size,1)
+optimizer=optimizers.SGD(lr).setup(model)
 
-model=TwoLayerNet(hidden_size,1)
 
 #开始训练
 for i in range(max_iter):
@@ -38,9 +31,7 @@ for i in range(max_iter):
 
     model.cleargrads()
     loss.backward()
-
-    for p in model.params():
-        p.data-=lr*p.grad.data
+    optimizer.update()
     
     if i%1000==0:
         print(loss)

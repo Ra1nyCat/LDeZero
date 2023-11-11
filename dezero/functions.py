@@ -211,3 +211,36 @@ class Sigmoid(Function):
 
 def sigmoid(x):
     return Sigmoid()(x)
+
+
+class GetItem(Function):
+
+    def __init__(self, slices):
+        self.slices = slices
+    
+    def forward(self,x):
+        y=x[self.slices]
+        return y
+    
+    def backward(self,gy):
+        x,=self.inputs
+        f=GetItemGrad(self.slices,x.shape)
+        return f(gy)
+
+def get_item(x,slices):
+    f=GetItem(slices)
+    return f(x)
+
+class GetItemGrad(Function):
+    def __init__(self,slices,in_shape):
+        self.slices=slices
+        self.in_shape=in_shape
+    
+    def forward(self,gy):
+        xp=dezero.cuda.get_array_module(gy)
+        gx=xp.zeros(self.in_shape,dtype=gy.dtype)
+        xp.add.at(gx,self.slices,gy)
+        return gx
+    
+    def backward(self,ggx):
+        return get_item(ggx,self.slices)
